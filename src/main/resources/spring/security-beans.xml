@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security-5.3.xsd">
+
+	<!-- Http element is use for web based security and they work with chain 
+		of servlet filter -->
+	<!-- here auto-config enable the filters for form-based logins -->
+	<!-- use-expression used for enable expressionlaguage in our jsp page -->
+	<!-- AuthenticationProvider ka kaam hota hai user ke credentials (jaise 
+		ki username aur password) ko verify karna, aur agar credentials sahi hain 
+		to ek authenticated user ko -->
+	<http auto-config="true" use-expressions="true">
+		<!-- form-login in spring security default page and default target url 
+			specify that if user authenticate the which pageuser land -->
+		<intercept-url pattern="/About"
+			access="hasRole('STUDENT')" />
+		<intercept-url pattern="/Contact"
+			access="hasRole('STUDENT')" />
+		<intercept-url pattern="/Courses"
+			access="hasRole('STUDENT')" />
+		<intercept-url pattern="/Teachers"
+			access="hasRole('STUDENT')" />
+
+		<form-login login-page="/Login" default-target-url="/home"
+			login-processing-url="/home" />
+		<csrf disabled="true" />
+
+		<logout  
+        logout-url="/logout"
+        logout-success-url="/Login"
+        invalidate-session="true"
+    	/>
+    	
+		<expression-handler ref="webexpressionHandler" />
+	</http>
+	<authentication-manager
+		alias="authenticationManager">
+		<authentication-provider
+			user-service-ref="userDetailsService">
+			<password-encoder ref="passwordEncoder" />
+		</authentication-provider>
+	</authentication-manager>
+
+	<global-method-security
+		pre-post-annotations="enabled">
+		<expression-handler
+			ref="defaultMethodSecurityExpressionHandler" />
+	</global-method-security>
+
+
+	<beans:bean id="userDetailsService"
+		class="com.services.UserDetailsServiceAdapter">
+
+	</beans:bean>
+
+	<beans:bean name="passwordEncoder" id="passwordEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</beans:bean>
+
+</beans:beans>

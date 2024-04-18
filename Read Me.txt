@@ -1,0 +1,5 @@
+Spring security project 
+use controller layer service layer Daolayer
+in which use custom authentication
+account for student 
+teacher 

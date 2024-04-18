@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+					http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+					http://www.springframework.org/schema/context
+					http://www.springframework.org/schema/context/spring-context-3.1.xsd
+					http://www.springframework.org/schema/jee
+					http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+					http://www.springframework.org/schema/tx
+					http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+					http://www.springframework.org/schema/util
+					http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+	<tx:annotation-driven />
+
+	<bean
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		name="ds">
+		<property name="driverClassName"
+			value="com.mysql.cj.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/springcustom?useSSL=false" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+	<bean name="jdbc"
+		class="org.springframework.jdbc.core.JdbcTemplate"
+		p:dataSource-ref="ds" />
+
+	<bean
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+		name="factory">
+		<property name="dataSource" ref="ds" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>com.entities.Student</value>
+				<value>com.entities.Users</value>
+				<value>com.entities.Teacher</value>
+				<value>com.entities.Role</value>
+
+			</list>
+		</property>
+	</bean>
+	<bean class="org.springframework.orm.hibernate5.HibernateTemplate"
+		name="hTemplate">
+		<property name="sessionFactory" ref="factory" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+		p:sessionFactory-ref="factory" />
+
+	<bean name="accountdao" class="com.Dao.AccountDaoHbn" />
+	<bean name="techerDaoHbn" class="com.Dao.TeacherDaoHbn" />
+	<bean name="roleDaoHbn" class="com.Dao.RoleDaoHbn" />
+	<bean name="userDaoHbn" class="com.Dao.UsersDaoHbn" />
+
+	<bean name="accountService"
+		class="com.services.AccountServiceImpl" />
+
+
+	<!-- this bean is use for Service layer authorization and it use for checking 
+		custom role mean remove ROLE_ -->
+	<bean id="defaultMethodSecurityExpressionHandler"
+		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+		<property name="defaultRolePrefix" value=""></property>
+	</bean>
+	<!-- this bean is same but is used is controll layer where we authorized 
+		the user on URL based check And remove ROLE_ -->
+	<bean id="webexpressionHandler"
+		class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler">
+		<property name="defaultRolePrefix" value=""></property>
+	</bean>
+
+	<context:component-scan
+		base-package="com.Dao.hibernate" />
+	<context:component-scan
+		base-package="com.services" />
+	<context:component-scan base-package="com.Dao" />
+
+</beans>
