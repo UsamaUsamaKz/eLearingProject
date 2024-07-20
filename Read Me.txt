@@ -1,5 +1,5 @@
 Spring security project 
-use controller layer service layer Daolayer
+use controller layer service layer Dao layer
 in which use custom authentication
 account for student 
 teacher 
